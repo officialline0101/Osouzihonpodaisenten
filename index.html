@@ -490,6 +490,34 @@
             }
         }
 
+        .info-text2 {
+            margin-top: 1px;
+            /* 上の余白 */
+            margin-bottom: 10px;
+            /* 下に白い隙間を追加 */
+            font-size: 13px;
+            color: #000000;
+            line-height: 1.5;
+            text-align: center;
+            word-wrap: break-word;
+            background-color: #eef9f5;
+            /* 青っぽい背景色を追加 */
+            padding: 0px;
+            border-radius: 4px;
+        }
+
+        /* 携帯端末向けのレスポンシブデザイン */
+        @media (max-width: 768px) {
+            .info-text2 {
+                font-size: 11.5px;
+                /* スマホでは少し小さく */
+                margin-top: 10px;
+                /* 上下のマージンを調整 */
+                line-height: 2.0;
+                /* テキストの高さ調整 */
+            }
+        }
+
         .symptoms,
         .options {
             display: block;
@@ -719,22 +747,25 @@
             transition: all 0.3s ease;
         }
 
-        .datetime-input {
-            width: 100%;
-            padding: 15px;
-            /* サイズを大きく調整 */
-            font-size: 18px;
-            /* フォントサイズを大きく */
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
+.datetime-input {
+    width: 100%;
+    padding: 18px; /* 少し大きめにして押しやすく */
+    font-size: 18px;
+    border: 2px solid #888; /* 少し濃くして視認性アップ */
+    border-radius: 8px; /* 指触りの良いデザイン */
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #333;
+    appearance: none; /* OSに左右されにくくする */
+    touch-action: manipulation; /* モバイルのタップ精度向上 */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
 
-        .datetime-input:focus+.datetime-placeholder,
-        .datetime-input:not(:placeholder-shown)+.datetime-placeholder {
-            visibility: hidden;
-            opacity: 0;
-        }
+.datetime-input:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2); /* タップ時の視覚的フィードバック */
+    outline: none;
+}
     </style>
 </head>
 
@@ -776,7 +807,6 @@
         <div class="datetime-wrapper" style="text-align: center;">
             <span class="placeholder" id="placeholder1">⇩タップして日時を入力⇩</span>
             <input type="datetime-local" id="date1" class="datetime-input" placeholder=" " aria-label="タップして日時を入力">
-            <span class="datetime-placeholder">タップして日時を入力</span>
         </div>
 
         <div class="highlight-background">
@@ -787,7 +817,6 @@
         <div class="datetime-wrapper" style="text-align: center;">
             <span class="placeholder" id="placeholder2">⇩タップして日時を入力⇩</span>
             <input type="datetime-local" id="date2" class="datetime-input" placeholder=" " aria-label="タップして日時を入力">
-            <span class="datetime-placeholder">タップして日時を入力</span>
         </div>
 
         <div class="highlight-background">
@@ -798,10 +827,9 @@
         <div class="datetime-wrapper" style="text-align: center;">
             <span class="placeholder" id="placeholder3">⇩タップして日時を入力⇩</span>
             <input type="datetime-local" id="date3" class="datetime-input" placeholder=" " aria-label="タップして日時を入力">
-            <span class="datetime-placeholder">タップして日時を入力</span>
         </div>
 
-
+<div class="info-text2"></div>
         <div class="label" id="course">メニューをお選びください<span class="required">必須</span></div>
         <div class="info-text">※メニューを選択すると空き状況のカレンダーが表示されます</div>
         <div class="menu-sections">

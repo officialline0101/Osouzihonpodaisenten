@@ -627,7 +627,7 @@
         }
 
         button:hover {
-            background-color: #444;
+            background-color: #f7f7f7;
             transform: scale(1.05);
         }
 
@@ -831,7 +831,7 @@
 
 <div class="info-text2"></div>
         <div class="label" id="course">メニューをお選びください<span class="required">必須</span></div>
-        <div class="info-text">※メニューを選択すると空き状況のカレンダーが表示されます</div>
+        <div class="info-text">1.メニューを選択すると下に項目が表示されます<br>2.エアコンクリーニングをご予約される場合は<br>他はご予約出来ません。</div>
         <div class="menu-sections">
             <button type="button" onclick="showMenu('beautifuleyebrows')">エアコンクリーニング</button>
             <button type="button" onclick="showMenu('shinyskin')">水まわりのお掃除</button>
@@ -939,7 +939,7 @@
     <script>
         let visitCount = '';
         let highschoolCount = '';
-        let selectedMenu = '';
+        let selectedMenu = [];
         let selectedSymptom = [];  // 配列として定義
         let selectedFullDate = '';
         let currentDate = new Date();
@@ -1151,29 +1151,47 @@
             // 選択された日時をリセット
             selectedFullDate = '';
 
-            // ボタンの選択状態を切り替える
-            button.classList.toggle('active');
+            // クリックしたボタンの `data-id` を取得
+            let selectedId = button.getAttribute('data-id');
 
-            // 選択されたオプションを取得
-            const updatedSelectedButtons = document.querySelectorAll('.symptoms button.active');
-
-            if (updatedSelectedButtons.length === 0) {
-                // すべてのボタンの選択が解除された場合、メニュー時間を0にリセット
-                selectedMenuTime = 0;
-                selectedSymptom = null; // 選択されたメニューをリセット
-                menuPrice = 0; // メニュー価格をリセット
+            // クリックしたボタンがすでに `active` なら解除
+            if (button.classList.contains('active')) {
+                button.classList.remove('active');
             } else {
-                // 1つだけ選択状態にする
-                if (updatedSelectedButtons.length > 1) {
-                    updatedSelectedButtons.forEach(btn => btn.classList.remove('active'));
-                    button.classList.add('active'); // クリックしたボタンだけを選択
+                // すでに選択されているボタンを取得（`active` のボタン）
+                let updatedSelectedButtons = document.querySelectorAll('.symptoms button.active');
+
+                // もし選択数が3を超えたら、新しい選択をキャンセル
+                if (updatedSelectedButtons.length >= 10) {
+                    return;
                 }
 
-                // 選択されたメニューの時間を取得して保存
-                const selectedMenu = button.textContent;
-                selectedMenuTime = menuTimes[selectedMenu] || 0; // メニュー時間を取得して保存
-                selectedSymptom = [selectedMenu]; // 選択されたメニュー名を配列として保存
-                menuPrice = parseInt(button.getAttribute('data-price'), 10) || 0;  // メニューの価格を取得
+                // クリックしたボタンだけ `active` を付与
+                button.classList.add('active');
+            }
+
+            // 現在選択されているボタンを取得（もう一度更新）
+            let updatedSelectedButtons = document.querySelectorAll('.symptoms button.active');
+            const selectedMenuNameDiv = document.getElementById('selected-menu-name');
+
+            // メニュー時間と価格をリセット
+            selectedMenuTime = 0;
+            selectedSymptom = [];
+            menuPrice = 0;
+
+            if (updatedSelectedButtons.length === 0) {
+                // すべてのボタンの選択が解除された場合
+                selectedMenuTime = 0;
+                selectedSymptom = null;
+                menuPrice = 0;
+            } else {
+                // 選択された各ボタンについて処理
+                updatedSelectedButtons.forEach((btn) => {
+                    const selectedMenu = btn.textContent;
+                    selectedMenuTime += menuTimes[selectedMenu] || 0;
+                    selectedSymptom.push(selectedMenu);
+                    menuPrice += parseInt(btn.getAttribute('data-price'), 10) || 0;
+                });
             }
 
             console.log('選択されたメニューの時間:', selectedMenuTime);
@@ -1313,47 +1331,39 @@
             fetchAvailability(currentDate);
         }
 
-        function showMenu(menu) {
-            // すべてのメニューボタンの選択状態をリセット
-            document.querySelectorAll('.menu-sections button').forEach(button => {
-                button.classList.remove('active');
-            });
+function showMenu(menu) {
+    const button = document.querySelector(`.menu-sections button[onclick="showMenu('${menu}')"]`);
+    const section = document.getElementById(menu);
+    if (!button || !section) return;
 
-            // 選択されたメニューの名前を取得
-            let selectedButton = document.querySelector(`.menu-sections button[onclick="showMenu('${menu}')"]`);
-            if (selectedButton) {
-                selectedMenu = selectedButton.innerText;
-            }
+    const beautifuleyebrowsBtn = document.querySelector(`.menu-sections button[onclick="showMenu('beautifuleyebrows')"]`);
+    const isBeautifuleyebrowsActive = beautifuleyebrowsBtn.classList.contains('active');
 
-            // 選択されたメニューセクションを表示
-            document.querySelectorAll('.menu-section').forEach(section => {
-                section.classList.remove('active');
-                section.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-            });
+    // エアコンクリーニング（beautifuleyebrows）が選択中で、かつ今回押されたのが別のボタンだったら無視
+    if (isBeautifuleyebrowsActive && menu !== 'beautifuleyebrows') {
+        return; // 他のメニューは開けない
+    }
 
-            // 対応するメニューボタンを選択状態にする
-            document.querySelectorAll('.menu-sections button').forEach(button => {
-                if (button.getAttribute('onclick') === `showMenu('${menu}')`) {
-                    button.classList.add('active');
-                }
-            });
+    const isActive = button.classList.contains('active');
 
-            // 選択されたメニューセクションを表示
-            document.getElementById(menu).classList.add('active');
+    if (isActive) {
+        button.classList.remove('active');
+        section.classList.remove('active');
+        selectedMenu = selectedMenu.filter(item => item !== button.innerText);
+    } else {
+        // 他のすべてのボタンとセクションを非アクティブにする
+        document.querySelectorAll('.menu-sections button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.menu-section').forEach(sec => sec.classList.remove('active'));
+        selectedMenu = [];
 
-            // `treatment-text` の内容をリセット
-            document.getElementById("treatment-text").innerHTML = "";
+        button.classList.add('active');
+        section.classList.add('active');
+        selectedMenu.push(button.innerText);
+    }
 
-            // メニューとオプションをリセット
-            selectedSymptom = '';      // メニューのリセット
-            irradiationsCount = '';    // オプションのリセット
-            menuPrice = 0;             // メニューの価格リセット
-            optionsPrice = 0;          // オプションの価格リセット
-            totalAmount = 0;           // 合計金額リセット
-
-            // 表示を更新
-            updateDisplayInfo();
-        }
+    document.getElementById("treatment-text").innerHTML = "";
+    updateDisplayInfo();
+}
 
         function selectDate(cell) {
             // "unavailable" クラスが付いている場合はクリックを無効化
@@ -1422,13 +1432,22 @@
     }
 
     // 各項目の表示を条件分岐
-    const mekaText = formData.meka ? `≪メーカー≫\n⇒${formData.meka}\n` : '';
+    const mekaText = formData.meka ? `\n【エアコンクリーニング情報】\n≪メーカー≫\n⇒${formData.meka}\n` : '';
     const nensuuText = formData.nensuu ? `≪年数≫\n⇒${formData.nensuu}\n` : '';
     const message2Text = formData.message2 ? `≪気になるところ≫\n⇒${formData.message2}\n` : '';
     const visitCountText = formData.visitCount ? `≪駐車場の有無≫\n⇒${formData.visitCount}\n` : '';
 
-    // LINEトークメッセージ作成
-    const messageText = `【予約フォーム】\n≪お名前≫\n⇒${formData.name}\n\n≪お名前（ふりがな）≫\n⇒${formData.namefurigana}\n\n≪電話番号≫\n⇒${formData.phone}\n\n≪ご依頼住所≫\n⇒${formData.zyuuyo}\n\n≪平日or休日≫\n⇒${formData.highschoolCount}\n\n≪メニュー項目≫\n⇒${formData.selectedMenu}\n≪メニュー≫\n⇒${formData.selectedSymptom}\n${mekaText}${nensuuText}${message2Text}${visitCountText}\n【希望日時】\n≪第一希望日≫\n⇒${formatDate(formData.dates[0])}\n\n≪第二希望日≫\n⇒${formatDate(formData.dates[1])}\n\n≪三希望日≫\n⇒${formatDate(formData.dates[2])}\n\n≪メッセージ≫\n⇒${formData.message}`;
+// メニューと症状のテキスト整形
+const selectedMenuText = Array.isArray(formData.selectedMenu)
+    ? formData.selectedMenu.map(item => `・${item}`).join('\n')
+    : `・${formData.selectedMenu}`;
+
+const selectedSymptomText = Array.isArray(formData.selectedSymptom)
+    ? formData.selectedSymptom.map(item => `・${item}`).join('\n')
+    : `・${formData.selectedSymptom}`;
+
+// メッセージ本文
+const messageText = `【予約フォーム】\n≪お名前≫\n⇒${formData.name}\n\n≪お名前（ふりがな）≫\n⇒${formData.namefurigana}\n\n≪電話番号≫\n⇒${formData.phone}\n\n≪ご依頼住所≫\n⇒${formData.zyuuyo}\n\n≪平日or休日≫\n⇒${formData.highschoolCount}\n\n≪メニュー項目≫\n${selectedMenuText}\n≪メニュー≫\n${selectedSymptomText}\n${mekaText}${nensuuText}${message2Text}${visitCountText}\n【希望日時】\n≪第一希望日≫\n⇒${formatDate(formData.dates[0])}\n\n≪第二希望日≫\n⇒${formatDate(formData.dates[1])}\n\n≪三希望日≫\n⇒${formatDate(formData.dates[2])}\n\n≪メッセージ≫\n⇒${formData.message}`;
 
     liff.sendMessages([{
         type: 'text',

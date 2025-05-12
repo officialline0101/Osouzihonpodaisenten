@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -1339,10 +1340,11 @@ function showMenu(menu) {
     const beautifuleyebrowsBtn = document.querySelector(`.menu-sections button[onclick="showMenu('beautifuleyebrows')"]`);
     const isBeautifuleyebrowsActive = beautifuleyebrowsBtn.classList.contains('active');
 
-    // エアコンクリーニング（beautifuleyebrows）が選択中で、かつ今回押されたのが別のボタンだったら無視
-    if (isBeautifuleyebrowsActive && menu !== 'beautifuleyebrows') {
-        return; // 他のメニューは開けない
-    }
+    // beautifuleyebrowsが選ばれている間は他を押しても無反応
+    if (isBeautifuleyebrowsActive && menu !== 'beautifuleyebrows') return;
+
+    // 逆に他のメニューが選ばれているときにbeautifuleyebrowsを押したら無反応
+    if (!isBeautifuleyebrowsActive && menu === 'beautifuleyebrows' && selectedMenu.length > 0) return;
 
     const isActive = button.classList.contains('active');
 
@@ -1351,11 +1353,6 @@ function showMenu(menu) {
         section.classList.remove('active');
         selectedMenu = selectedMenu.filter(item => item !== button.innerText);
     } else {
-        // 他のすべてのボタンとセクションを非アクティブにする
-        document.querySelectorAll('.menu-sections button').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.menu-section').forEach(sec => sec.classList.remove('active'));
-        selectedMenu = [];
-
         button.classList.add('active');
         section.classList.add('active');
         selectedMenu.push(button.innerText);

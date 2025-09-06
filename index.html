@@ -16,7 +16,7 @@
             /* さらに右へ */
             top: 80%;
             /* 画面中央に固定 */
-            transform: translateY(-50%) translateX(12px);
+            transform: translateY(-50%) translateX(15px);
             /* 中央配置と右ずらし */
             background: #2ebddb;
             display: flex;
@@ -847,14 +847,14 @@
                 <span class="highlight-text">◆エアコンクリーニング◆</span>
             </div>
             <div class="symptoms">
-                <div class="info-text">※九年以降ですと年数の部品保有期間が<br>過ぎたものがある可能性がございます。</div>
+                <div class="info-text">※九年以降ですとメーカーの部品保有期間が<br>過ぎたものがある可能性がございます。</div>
                 <button type="button" onclick="selectSymptom(this, 'treatment1')" data-price="1">壁掛けスタンダートタイプ</button>
                 <button type="button" onclick="selectSymptom(this, 'treatment2')" data-price="15000">お掃除機能付き</button>
                 <button type="button" onclick="selectSymptom(this, 'treatment2')" data-price="15000">業務用タイプ</button>
             </div>
-            <div class="label">年数<span class="required">必須</span></div>
-            <input type="text" id="meka" placeholder="年数を入力してください">
-            <div class="label">年数<span class="required">必須</span></div>
+            <div class="label">メーカー</div>
+            <input type="text" id="meka" placeholder="メーカーを入力してください">
+            <div class="label">年数</div>
             <input type="text" id="nensuu" placeholder="年数を入力してください">
             <div class="labelContent">現在の状態で気になる点をご記入ください。</div>
             <textarea id="message2" rows="4" placeholder="メッセージを入力してください"></textarea>
@@ -1429,7 +1429,7 @@ function showMenu(menu) {
     }
 
     // 各項目の表示を条件分岐
-    const mekaText = formData.meka ? `\n【エアコンクリーニング情報】\n≪年数≫\n⇒${formData.meka}\n` : '';
+    const mekaText = formData.meka ? `\n【エアコンクリーニング情報】\n≪メーカー≫\n⇒${formData.meka}\n` : '';
     const nensuuText = formData.nensuu ? `≪年数≫\n⇒${formData.nensuu}\n` : '';
     const message2Text = formData.message2 ? `≪気になるところ≫\n⇒${formData.message2}\n` : '';
     const visitCountText = formData.visitCount ? `≪駐車場の有無≫\n⇒${formData.visitCount}\n` : '';
